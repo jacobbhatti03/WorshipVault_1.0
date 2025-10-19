@@ -1,29 +1,15 @@
-🙏 WorshipVault
-WorshipVault is a cloud-based media sharing app built with Streamlit and Firebase.
-It allows users to upload, share, and download worship-related images and PDFs — all in one shared space.
+# WorshipVault
 
-🚀 Features
-📤 Upload images (.jpg, .png) or PDFs
-📁 All uploaded files can be shared and downloaded
-🎨 Clean, modern Streamlit UI
-☁️ Cloud storage and authentication (coming soon)
-🧠 Tech Stack
-Layer	Technology
-Frontend	Streamlit
-Backend	Firebase (Planned)
-Hosting	Streamlit Cloud
-Language	Python
-💻 Run Locally (Optional)
-If you want to run WorshipVault on your own computer:
+WorshipVault is a Streamlit-based media management app for uploading, previewing, and downloading worship-related images and PDFs.
 
-# Clone this repository
-git clone https://github.com/<your-username>/worshipvault.git
+## Features
+- Upload up to **200 MB per file** (Streamlit max)
+- Multiple file uploads
+- Image preview and PDF download
+- Automatic folder cleanup on restart
+- Ready for future Firebase cloud storage integration
 
-# Move into the project directory
-cd worshipvault
-
-# Install dependencies
+## How to Run Locally
+```bash
 pip install -r requirements.txt
-
-# Run the Streamlit app
 streamlit run app.py
