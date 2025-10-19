@@ -1,40 +1,100 @@
 import streamlit as st
-from datetime import datetime
+from PIL import Image
+import os
+import io
+import time
 
-# Page Config
-st.set_page_config(page_title="WorshipVault", page_icon="🙏", layout="wide")
+# ------------------------------------------------------------
+# WorshipVault – Media Upload & Download App
+# Version: 1.0  |  Author: Jacob Bhatti
+# ------------------------------------------------------------
 
-# Header Section
-st.markdown("""
-    <div style='text-align: center;'>
-        <h1>🙏 WorshipVault</h1>
-        <h4>Share and download worship media files with your community.</h4>
-    </div>
-    <hr>
-""", unsafe_allow_html=True)
+# 🔧 Streamlit configuration
+st.set_page_config(
+    page_title="WorshipVault",
+    page_icon="✨",
+    layout="wide"
+)
 
-# Upload Section
-st.subheader("📤 Upload Your File")
-uploaded_file = st.file_uploader("Select image or PDF", type=["jpg", "jpeg", "png", "pdf"])
+# 🔧 Max upload limits
+# (200 MB per file is Streamlit Cloud’s hard limit)
+st.set_option("server.maxUploadSize", 200)
+st.set_option("server.maxMessageSize", 400)
 
-if uploaded_file:
-    # Display file name and download option
-    st.success(f"✅ '{uploaded_file.name}' uploaded successfully!")
-    st.download_button(
-        label="⬇️ Download This File",
-        data=uploaded_file,
-        file_name=uploaded_file.name,
-        mime="application/octet-stream"
-    )
+# ------------------------------------------------------------
+# Paths and folders
+UPLOAD_DIR = "uploaded_files"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# Divider
+# Optional: Clean folder at every app restart
+for f in os.listdir(UPLOAD_DIR):
+    try:
+        os.remove(os.path.join(UPLOAD_DIR, f))
+    except Exception:
+        pass
+
+# ------------------------------------------------------------
+# UI Header
+st.title("✨ WorshipVault")
+st.caption("Securely upload, view, and download your worship media files.")
 st.divider()
 
-# About Section
-st.markdown("""
-### 🌍 About WorshipVault
-WorshipVault is a shared media cloud app designed for worship teams, churches, and creators to 
-upload, access, and download worship images, lyric slides, and PDFs — all in one place.
+# ------------------------------------------------------------
+# Sidebar Info
+st.sidebar.header("📁 App Settings")
+st.sidebar.info(
+    "• Max upload size: 200 MB per file\n"
+    "• Supported: JPG, PNG, PDF\n"
+    "• Auto-clears old uploads on restart"
+)
 
-🚧 *Next update: Cloud storage + login system with Firebase integration.*
-""")
+# Placeholder for future Firebase toggle
+use_firebase = st.sidebar.checkbox("Use Firebase Storage (coming soon)", value=False)
+
+# ------------------------------------------------------------
+# File Uploader
+uploaded_files = st.file_uploader(
+    "📤 Upload your worship images or PDFs",
+    accept_multiple_files=True,
+    type=["jpg", "jpeg", "png", "pdf"]
+)
+
+if uploaded_files:
+    st.success(f"✅ {len(uploaded_files)} file(s) uploaded successfully!")
+
+    for file in uploaded_files:
+        file_path = os.path.join(UPLOAD_DIR, file.name)
+
+        # Save file locally
+        with open(file_path, "wb") as f:
+            f.write(file.getbuffer())
+
+        # Display image previews (for supported types)
+        if file.type in ["image/png", "image/jpeg"]:
+            img = Image.open(file)
+            st.image(img, caption=file.name, use_container_width=True)
+        else:
+            st.write(f"📄 {file.name} (PDF file)")
+
+        # Provide download link
+        with open(file_path, "rb") as f:
+            btn = st.download_button(
+                label=f"⬇️ Download {file.name}",
+                data=f,
+                file_name=file.name,
+                mime=file.type
+            )
+
+        st.divider()
+
+# ------------------------------------------------------------
+# Footer
+st.markdown(
+    """
+    <div style="text-align:center; color:gray; margin-top:2rem;">
+        WorshipVault © 2025 — Built with ❤️ using Streamlit  
+        <br>Max upload 200 MB | Auto-clean enabled
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
